@@ -105,11 +105,6 @@ After successful authentication, the auth hash will be available in `request.env
     refresh_token: 'Aa1FdeggRhTnPNNpxr8p'
   },
   extra: {
-    raw_info: {
-      sub: 'U4af4980629...',
-      name: 'Taro Line',
-      picture: 'https://profile.line-scdn.net/...'
-    },
     id_token: 'eyJhbGciOiJIUzI1NiJ9...',
     id_info: {
       iss: 'https://access.line.me',
