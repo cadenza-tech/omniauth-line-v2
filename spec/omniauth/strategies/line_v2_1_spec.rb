@@ -7,10 +7,10 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
   describe 'default options' do
     it 'has correct default values' do
       expect(strategy.options.name).to eq('line_v2_1')
-      expect(strategy.options.scope).to eq('profile openid email')
       expect(strategy.options.client_options.site).to eq('https://access.line.me')
       expect(strategy.options.client_options.authorize_url).to eq('/oauth2/v2.1/authorize')
       expect(strategy.options.client_options.token_url).to eq('https://api.line.me/oauth2/v2.1/token')
+      expect(strategy.options.scope).to eq('profile openid email')
     end
   end
 
@@ -324,6 +324,48 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
     end
   end
 
+  describe '#empty?' do
+    it 'returns true for nil values' do
+      expect(strategy.send(:empty?, nil)).to be(true)
+    end
+
+    it 'returns true for empty strings' do
+      expect(strategy.send(:empty?, '')).to be(true)
+    end
+
+    it 'returns true for empty arrays' do
+      expect(strategy.send(:empty?, [])).to be(true)
+    end
+
+    it 'returns true for empty hashes' do
+      expect(strategy.send(:empty?, {})).to be(true)
+    end
+
+    it 'returns false for non-empty strings' do
+      expect(strategy.send(:empty?, 'value')).to be(false)
+    end
+
+    it 'returns false for non-empty arrays' do
+      expect(strategy.send(:empty?, [1, 2, 3])).to be(false)
+    end
+
+    it 'returns false for non-empty hashes' do
+      expect(strategy.send(:empty?, { key: 'value' })).to be(false)
+    end
+
+    it 'returns false for zero values' do
+      expect(strategy.send(:empty?, 0)).to be(false)
+    end
+
+    it 'returns false for false values' do
+      expect(strategy.send(:empty?, false)).to be(false)
+    end
+
+    it 'returns false for objects that do not respond to empty?' do
+      expect(strategy.send(:empty?, 123)).to be(false)
+    end
+  end
+
   describe '#id_token_info' do
     let(:client) { instance_double(OAuth2::Client) }
     let(:response) do
@@ -457,48 +499,6 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
         expect(result).to be_nil
         expect(strategy).to have_received(:fail!).with(:id_token_verification_failed, instance_of(StandardError))
       end
-    end
-  end
-
-  describe '#empty?' do
-    it 'returns true for nil values' do
-      expect(strategy.send(:empty?, nil)).to be(true)
-    end
-
-    it 'returns true for empty strings' do
-      expect(strategy.send(:empty?, '')).to be(true)
-    end
-
-    it 'returns true for empty arrays' do
-      expect(strategy.send(:empty?, [])).to be(true)
-    end
-
-    it 'returns true for empty hashes' do
-      expect(strategy.send(:empty?, {})).to be(true)
-    end
-
-    it 'returns false for non-empty strings' do
-      expect(strategy.send(:empty?, 'value')).to be(false)
-    end
-
-    it 'returns false for non-empty arrays' do
-      expect(strategy.send(:empty?, [1, 2, 3])).to be(false)
-    end
-
-    it 'returns false for non-empty hashes' do
-      expect(strategy.send(:empty?, { key: 'value' })).to be(false)
-    end
-
-    it 'returns false for zero values' do
-      expect(strategy.send(:empty?, 0)).to be(false)
-    end
-
-    it 'returns false for false values' do
-      expect(strategy.send(:empty?, false)).to be(false)
-    end
-
-    it 'returns false for objects that do not respond to empty?' do
-      expect(strategy.send(:empty?, 123)).to be(false)
     end
   end
 end
