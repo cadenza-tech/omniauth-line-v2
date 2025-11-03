@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.0] - 2025-11-03
+
+- Refactor: Remove redundant user info endpoint call
+- Test: Update test
+- Other: Update README.md
+
 ## [1.1.0] - 2025-08-02
 
 - Refactor: Refactor `OmniAuth::Strategies::LineV21#authorize_params`
