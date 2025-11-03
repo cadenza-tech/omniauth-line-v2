@@ -27,15 +27,9 @@ Layout/LineLength:
   Max: 150
   AllowURI: false
 
-# https://docs.rubocop.org/rubocop/cops_metrics.html#metricsabcsize
-Metrics/AbcSize:
-  Enabled: true
-  Max: 25
-
 # https://docs.rubocop.org/rubocop/cops_metrics.html#metricsblocklength
 Metrics/BlockLength:
   Enabled: true
-  Max: 30
   Exclude:
     - 'omniauth-line-v2_1.gemspec'
     - 'spec/omniauth/strategies/line_v2_1_spec.rb'
@@ -50,18 +44,12 @@ Metrics/ClassLength:
 Metrics/MethodLength:
   Enabled: true
   CountComments: false
-  Max: 25
+  Max: 20
 
 # https://docs.rubocop.org/rubocop/cops_metrics.html#metricsmodulelength
 Metrics/ModuleLength:
   Enabled: true
   Max: 200
-
-# https://docs.rubocop.org/rubocop/cops_metrics.html#metricsparameterlists
-Metrics/ParameterLists:
-  Enabled: true
-  Max: 5
-  CountKeywordArgs: true
 
 # https://docs.rubocop.org/rubocop/cops_naming.html#namingaccessormethodname
 Naming/AccessorMethodName:
@@ -198,19 +186,9 @@ Style/WordArray:
 # https://docs.rubocop.org/rubocop-rspec/cops_rspec.html#rspecexamplelength
 RSpec/ExampleLength:
   Enabled: true
-  Max: 50
+  Max: 25
 
 # https://docs.rubocop.org/rubocop-rspec/cops_rspec.html#rspecmultipleexpectations
 RSpec/MultipleExpectations:
   Enabled: true
   Max: 5
-
-# https://docs.rubocop.org/rubocop-rspec/cops_rspec.html#rspecmultiplememoizedhelpers
-RSpec/MultipleMemoizedHelpers:
-  Enabled: true
-  Max: 7
-
-# https://docs.rubocop.org/rubocop-rspec/cops_rspec.html#rspecnestedgroups
-RSpec/NestedGroups:
-  Enabled: true
-  Max: 3
