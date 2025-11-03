@@ -25,26 +25,29 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
   end
 
   describe '#uid' do
-    let(:raw_info) { { 'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz' } }
+    let(:id_token_info) { { raw: nil, decoded: { 'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz' } } }
 
-    before { allow(strategy).to receive(:raw_info).and_return(raw_info) }
+    before { allow(strategy).to receive(:id_token_info).and_return(id_token_info) }
 
-    it 'returns the sub from raw_info' do
+    it 'returns the sub from id_token_info' do
       expect(strategy.uid).to eq('U1234567890abcdefghijklmnopqrstuvwxyz')
     end
   end
 
   describe '#info' do
-    let(:raw_info) do
+    let(:id_token_info) do
       {
-        'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz',
-        'name' => 'Test User',
-        'picture' => 'https://profile.line-scdn.net/avatar.jpg'
+        raw: nil,
+        decoded: {
+          'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz',
+          'name' => 'Test User',
+          'picture' => 'https://profile.line-scdn.net/avatar.jpg',
+          'email' => 'user@example.com'
+        }
       }
     end
-    let(:id_token_info) { { raw: nil, decoded: { 'email' => 'user@example.com' } } }
 
-    before { allow(strategy).to receive_messages(raw_info: raw_info, id_token_info: id_token_info) }
+    before { allow(strategy).to receive(:id_token_info).and_return(id_token_info) }
 
     it 'returns correct info hash' do
       info = strategy.info
@@ -57,34 +60,26 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
     end
 
     it 'prunes empty values' do
-      allow(strategy).to receive_messages(
-        raw_info: {
-          'sub' => 'test',
-          'name' => nil,
-          'email' => ''
-        },
-        id_token_info: {
+      allow(strategy).to receive(:id_token_info).and_return(
+        {
           raw: nil,
           decoded: {
-            'email' => nil
+            'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz',
+            'name' => 'Test User',
+            'picture' => nil,
+            'email' => ''
           }
         }
       )
       info = strategy.info
       expect(info).to have_key(:nickname)
-      expect(info).not_to have_key(:name)
+      expect(info).to have_key(:name)
+      expect(info).not_to have_key(:image)
       expect(info).not_to have_key(:email)
     end
   end
 
   describe '#extra' do
-    let(:raw_info) do
-      {
-        'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz',
-        'name' => 'Test User',
-        'picture' => 'https://profile.line-scdn.net/avatar.jpg'
-      }
-    end
     let(:id_token_info) do
       {
         raw: 'test_id_token',
@@ -104,16 +99,11 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
       }
     end
 
-    before { allow(strategy).to receive_messages(raw_info: raw_info, id_token_info: id_token_info) }
+    before { allow(strategy).to receive(:id_token_info).and_return(id_token_info) }
 
     it 'returns correct extra hash' do
       extra = strategy.extra
       expect(extra).to eq(
-        raw_info: {
-          'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz',
-          'name' => 'Test User',
-          'picture' => 'https://profile.line-scdn.net/avatar.jpg'
-        },
         id_token: 'test_id_token',
         id_info: {
           'iss' => 'https://access.line.me',
@@ -137,32 +127,8 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
         decoded: ''
       })
       extra = strategy.extra
-      expect(extra).to have_key(:raw_info)
       expect(extra).not_to have_key(:id_token)
       expect(extra).not_to have_key(:id_info)
-    end
-
-    context 'when skip_info is true' do
-      before { allow(strategy).to receive(:skip_info?).and_return(true) }
-
-      it 'does not include raw_info' do
-        extra = strategy.extra
-        expect(extra).not_to have_key(:raw_info)
-        expect(extra[:id_token]).to eq('test_id_token')
-        expect(extra[:id_info]).to eq({
-          'iss' => 'https://access.line.me',
-          'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz',
-          'aud' => '1234567890',
-          'exp' => 1504169092,
-          'iat' => 1504263657,
-          'auth_time' => 1504263657,
-          'nonce' => '0987654asdf',
-          'amr' => ['pwd'],
-          'name' => 'Test User',
-          'picture' => 'https://profile.line-scdn.net/avatar.jpg',
-          'email' => 'user@example.com'
-        })
-      end
     end
   end
 
@@ -230,25 +196,6 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
         )
         expect(credentials).not_to have_key(:refresh_token)
       end
-    end
-  end
-
-  describe '#raw_info' do
-    let(:access_token) { instance_double(OAuth2::AccessToken, token: 'token') }
-    let(:response) { instance_double(OAuth2::Response, parsed: { 'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz' }) }
-
-    before do
-      allow(access_token).to receive(:get).and_return(response)
-      allow(strategy).to receive(:access_token).and_return(access_token)
-    end
-
-    it 'fetches user info from API' do
-      expect(strategy.raw_info).to eq({ 'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz' })
-    end
-
-    it 'memoizes the result' do
-      2.times { strategy.raw_info }
-      expect(access_token).to have_received(:get).once
     end
   end
 
@@ -384,7 +331,7 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
         OAuth2::Response,
         parsed: {
           'iss' => 'https://access.line.me',
-          'sub' => 'U1234567890',
+          'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz',
           'aud' => 'channel_id',
           'exp' => 1234567890,
           'iat' => 1234567890,
@@ -406,7 +353,7 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
       expect(id_token_info[:raw]).to eq('test_id_token')
       expect(id_token_info[:decoded]).to eq({
         'iss' => 'https://access.line.me',
-        'sub' => 'U1234567890',
+        'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz',
         'aud' => 'channel_id',
         'exp' => 1234567890,
         'iat' => 1234567890,
@@ -438,14 +385,14 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
     end
   end
 
-  describe '#verify_id_token' do
+  describe '#verify_and_decode_id_token' do
     let(:client) { instance_double(OAuth2::Client) }
     let(:response) do
       instance_double(
         OAuth2::Response,
         parsed: {
           'iss' => 'https://access.line.me',
-          'sub' => 'U1234567890',
+          'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz',
           'aud' => 'channel_id',
           'exp' => 1234567890,
           'iat' => 1234567890,
@@ -462,7 +409,7 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
     end
 
     it 'sends verification request to LINE API' do
-      strategy.send(:verify_id_token, 'test_id_token')
+      strategy.send(:verify_and_decode_id_token, 'test_id_token')
       expect(client).to have_received(:request).with(
         :post,
         'https://api.line.me/oauth2/v2.1/verify',
@@ -475,7 +422,7 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
 
     it 'includes nonce when present in session' do
       allow(strategy).to receive(:session).and_return({ 'omniauth.nonce' => '0987654asdf' })
-      strategy.send(:verify_id_token, 'test_id_token')
+      strategy.send(:verify_and_decode_id_token, 'test_id_token')
       expect(client).to have_received(:request).with(
         :post,
         'https://api.line.me/oauth2/v2.1/verify',
@@ -487,10 +434,10 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
     end
 
     it 'returns parsed response on success' do
-      result = strategy.send(:verify_id_token, 'test_id_token')
+      result = strategy.send(:verify_and_decode_id_token, 'test_id_token')
       expect(result).to eq({
         'iss' => 'https://access.line.me',
-        'sub' => 'U1234567890',
+        'sub' => 'U1234567890abcdefghijklmnopqrstuvwxyz',
         'aud' => 'channel_id',
         'exp' => 1234567890,
         'iat' => 1234567890,
@@ -506,7 +453,7 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
       end
 
       it 'calls fail! with verification error' do
-        result = strategy.send(:verify_id_token, 'test_id_token')
+        result = strategy.send(:verify_and_decode_id_token, 'test_id_token')
         expect(result).to be_nil
         expect(strategy).to have_received(:fail!).with(:id_token_verification_failed, instance_of(StandardError))
       end

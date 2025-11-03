@@ -1,40 +1,36 @@
 # frozen_string_literal: true
 
 require 'omniauth-oauth2'
+require 'uri'
 
 module OmniAuth
   module Strategies
     class LineV21 < OmniAuth::Strategies::OAuth2
       DEFAULT_SCOPE = 'profile openid email'
-      USER_INFO_URL = 'https://api.line.me/oauth2/v2.1/userinfo'
       ID_TOKEN_VERIFY_URL = 'https://api.line.me/oauth2/v2.1/verify'
 
       option :name, 'line_v2_1'
-
       option :client_options, {
         site: 'https://access.line.me',
         authorize_url: '/oauth2/v2.1/authorize',
         token_url: 'https://api.line.me/oauth2/v2.1/token'
       }
-
       option :authorize_options, [:scope, :state, :nonce, :prompt, :bot_prompt]
-
       option :scope, DEFAULT_SCOPE
 
-      uid { raw_info['sub'] }
+      uid { id_token_info[:decoded]['sub'] }
 
       info do
         prune!({
-          name: raw_info['name'],
-          nickname: raw_info['sub'],
-          image: raw_info['picture'],
+          name: id_token_info[:decoded]['name'],
+          nickname: id_token_info[:decoded]['sub'],
+          image: id_token_info[:decoded]['picture'],
           email: id_token_info[:decoded]['email']
         })
       end
 
       extra do
         hash = {}
-        hash[:raw_info] = raw_info unless skip_info?
         hash[:id_token] = id_token_info[:raw] if id_token_info[:raw]
         hash[:id_info] = id_token_info[:decoded] if id_token_info[:decoded]
         prune!(hash)
@@ -46,10 +42,6 @@ module OmniAuth
         hash[:expires_at] = access_token.expires_at if access_token.expires?
         hash[:refresh_token] = access_token.refresh_token if access_token.refresh_token
         hash
-      end
-
-      def raw_info
-        @raw_info ||= access_token.get(USER_INFO_URL, headers: { 'Authorization' => "Bearer #{access_token.token}" }).parsed
       end
 
       def callback_url
@@ -89,11 +81,11 @@ module OmniAuth
         return @id_token_info unless access_token.params['id_token']
 
         @id_token_info[:raw] = access_token.params['id_token']
-        @id_token_info[:decoded] = verify_id_token(access_token.params['id_token'])
+        @id_token_info[:decoded] = verify_and_decode_id_token(access_token.params['id_token'])
         @id_token_info
       end
 
-      def verify_id_token(id_token)
+      def verify_and_decode_id_token(id_token)
         params = {
           id_token: id_token,
           client_id: options.client_id
