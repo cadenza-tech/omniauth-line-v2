@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFilePathFormat
+RSpec.describe OmniAuth::Strategies::Line do # rubocop:disable RSpec/SpecFilePathFormat
   let(:options) { {} }
   let(:strategy) { described_class.new('app', 'channel_id', 'channel_secret', options) }
 
   describe 'default options' do
     it 'has correct default values' do
-      expect(strategy.options.name).to eq('line_v2_1')
+      expect(strategy.options.name).to eq('line')
       expect(strategy.options.client_options.site).to eq('https://access.line.me')
       expect(strategy.options.client_options.authorize_url).to eq('/oauth2/v2.1/authorize')
       expect(strategy.options.client_options.token_url).to eq('https://api.line.me/oauth2/v2.1/token')
@@ -202,8 +202,8 @@ RSpec.describe OmniAuth::Strategies::LineV21 do # rubocop:disable RSpec/SpecFile
   describe '#callback_url' do
     context 'without redirect_uri option' do
       it 'builds callback url from request' do
-        allow(strategy).to receive_messages(full_host: 'https://example.com', callback_path: '/auth/line_v2_1/callback')
-        expect(strategy.callback_url).to eq('https://example.com/auth/line_v2_1/callback')
+        allow(strategy).to receive_messages(full_host: 'https://example.com', callback_path: '/auth/line/callback')
+        expect(strategy.callback_url).to eq('https://example.com/auth/line/callback')
       end
     end
 

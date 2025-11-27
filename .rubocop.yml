@@ -31,8 +31,8 @@ Layout/LineLength:
 Metrics/BlockLength:
   Enabled: true
   Exclude:
-    - 'omniauth-line-v2_1.gemspec'
-    - 'spec/omniauth/strategies/line_v2_1_spec.rb'
+    - 'omniauth-line-v2.gemspec'
+    - 'spec/omniauth/strategies/line_spec.rb'
 
 # https://docs.rubocop.org/rubocop/cops_metrics.html#metricsclasslength
 Metrics/ClassLength:
@@ -64,14 +64,7 @@ Naming/BlockForwarding:
 Naming/FileName:
   Enabled: true
   Exclude:
-    - 'lib/omniauth-line-v2_1.rb'
-
-# https://docs.rubocop.org/rubocop/cops_naming.html#namingclassandmodulecamelcase
-Naming/ClassAndModuleCamelCase:
-  Enabled: true
-  Exclude:
-    - 'lib/omniauth/line_v2_1/version.rb'
-    - 'lib/omniauth/strategies/line_v2_1.rb'
+    - 'lib/omniauth-line-v2.rb'
 
 # https://docs.rubocop.org/rubocop/cops_naming.html#namingvariablenumber
 Naming/VariableNumber:
