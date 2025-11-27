@@ -6,7 +6,7 @@ on:
       - '.rubocop.yml'
       - 'Gemfile'
       - 'Rakefile'
-      - 'omniauth-line-v2_1.gemspec'
+      - 'omniauth-line-v2.gemspec'
       - '**/*.rb'
 permissions:
   contents: read

@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-require_relative 'lib/omniauth/line_v2_1/version'
+require_relative 'lib/omniauth/line_v2/version'
 
 Gem::Specification.new do |spec|
-  spec.name = 'omniauth-line-v2_1'
-  spec.version = OmniAuth::LineV21::VERSION
+  spec.name = 'omniauth-line-v2'
+  spec.version = OmniAuth::LineV2::VERSION
   spec.description = 'LINE strategy for OmniAuth'
   spec.summary = 'LINE strategy for OmniAuth'
   spec.authors = ['Masahiro']
   spec.email = ['watanabe@cadenza-tech.com']
   spec.license = 'MIT'
 
-  github_root_uri = 'https://github.com/cadenza-tech/omniauth-line-v2_1'
+  github_root_uri = 'https://github.com/cadenza-tech/omniauth-line-v2'
   spec.homepage = "#{github_root_uri}/tree/v#{spec.version}"
   spec.metadata = {
     'homepage_uri' => spec.homepage,

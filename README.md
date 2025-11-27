@@ -1,6 +1,6 @@
-# OmniauthLineV2.1
+# OmniauthLineV2
 
-[![License](https://img.shields.io/github/license/cadenza-tech/omniauth-line-v2_1?label=License&labelColor=343B42&color=blue)](https://github.com/cadenza-tech/omniauth-line-v2_1/blob/main/LICENSE.txt) [![Tag](https://img.shields.io/github/tag/cadenza-tech/omniauth-line-v2_1?label=Tag&logo=github&labelColor=343B42&color=2EBC4F)](https://github.com/cadenza-tech/omniauth-line-v2_1/blob/main/CHANGELOG.md) [![Release](https://github.com/cadenza-tech/omniauth-line-v2_1/actions/workflows/release.yml/badge.svg)](https://github.com/cadenza-tech/omniauth-line-v2_1/actions?query=workflow%3Arelease) [![Test](https://github.com/cadenza-tech/omniauth-line-v2_1/actions/workflows/test.yml/badge.svg)](https://github.com/cadenza-tech/omniauth-line-v2_1/actions?query=workflow%3Atest) [![Lint](https://github.com/cadenza-tech/omniauth-line-v2_1/actions/workflows/lint.yml/badge.svg)](https://github.com/cadenza-tech/omniauth-line-v2_1/actions?query=workflow%3Alint)
+[![License](https://img.shields.io/github/license/cadenza-tech/omniauth-line-v2?label=License&labelColor=343B42&color=blue)](https://github.com/cadenza-tech/omniauth-line-v2/blob/main/LICENSE.txt) [![Tag](https://img.shields.io/github/tag/cadenza-tech/omniauth-line-v2?label=Tag&logo=github&labelColor=343B42&color=2EBC4F)](https://github.com/cadenza-tech/omniauth-line-v2/blob/main/CHANGELOG.md) [![Release](https://github.com/cadenza-tech/omniauth-line-v2/actions/workflows/release.yml/badge.svg)](https://github.com/cadenza-tech/omniauth-line-v2/actions?query=workflow%3Arelease) [![Test](https://github.com/cadenza-tech/omniauth-line-v2/actions/workflows/test.yml/badge.svg)](https://github.com/cadenza-tech/omniauth-line-v2/actions?query=workflow%3Atest) [![Lint](https://github.com/cadenza-tech/omniauth-line-v2/actions/workflows/lint.yml/badge.svg)](https://github.com/cadenza-tech/omniauth-line-v2/actions?query=workflow%3Alint)
 
 LINE strategy for OmniAuth.
 
@@ -20,13 +20,13 @@ LINE strategy for OmniAuth.
 Install the gem and add to the application's Gemfile by executing:
 
 ```bash
-bundle add omniauth-line-v2_1
+bundle add omniauth-line-v2
 ```
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
 ```bash
-gem install omniauth-line-v2_1
+gem install omniauth-line-v2
 ```
 
 ## Usage
@@ -38,7 +38,7 @@ Add the following to `config/initializers/devise.rb`:
 ```ruby
 # config/initializers/devise.rb
 Devise.setup do |config|
-  config.omniauth :line_v2_1, ENV['LINE_CHANNEL_ID'], ENV['LINE_CHANNEL_SECRET']
+  config.omniauth :line, ENV['LINE_CHANNEL_ID'], ENV['LINE_CHANNEL_SECRET']
 end
 ```
 
@@ -57,7 +57,7 @@ Add the OmniAuth configuration to your Devise model:
 class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :omniauthable, omniauth_providers: [:line_v2_1]
+         :omniauthable, omniauth_providers: [:line]
 end
 ```
 
@@ -68,10 +68,10 @@ You can configure several options:
 ```ruby
 # config/initializers/devise.rb
 Devise.setup do |config|
-  config.omniauth :line_v2_1, ENV['LINE_CHANNEL_ID'], ENV['LINE_CHANNEL_SECRET'],
+  config.omniauth :line, ENV['LINE_CHANNEL_ID'], ENV['LINE_CHANNEL_SECRET'],
     {
       scope: 'profile openid', # Specify OAuth scopes
-      callback_path: '/custom/line_v2_1/callback', # Custom callback path
+      callback_path: '/custom/line/callback', # Custom callback path
       prompt: 'consent', # Optional: force consent screen
       bot_prompt: 'aggressive' # Optional: LINE official account linking
     }
@@ -90,7 +90,7 @@ After successful authentication, the auth hash will be available in `request.env
 
 ```ruby
 {
-  provider: 'line_v2_1',
+  provider: 'line',
   uid: 'U4af4980629...',
   info: {
     name: 'Taro Line',
@@ -125,19 +125,19 @@ After successful authentication, the auth hash will be available in `request.env
 
 ## Changelog
 
-See [CHANGELOG.md](https://github.com/cadenza-tech/omniauth-line-v2_1/blob/main/CHANGELOG.md).
+See [CHANGELOG.md](https://github.com/cadenza-tech/omniauth-line-v2/blob/main/CHANGELOG.md).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/cadenza-tech/omniauth-line-v2_1. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/cadenza-tech/omniauth-line-v2_1/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/cadenza-tech/omniauth-line-v2. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/cadenza-tech/omniauth-line-v2/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://github.com/cadenza-tech/omniauth-line-v2_1/blob/main/LICENSE.txt).
+The gem is available as open source under the terms of the [MIT License](https://github.com/cadenza-tech/omniauth-line-v2/blob/main/LICENSE.txt).
 
 ## Code of Conduct
 
-Everyone interacting in the OmniauthLineV2.1 project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/cadenza-tech/omniauth-line-v2_1/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the OmniauthLineV2 project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/cadenza-tech/omniauth-line-v2/blob/main/CODE_OF_CONDUCT.md).
 
 ## Sponsor
 

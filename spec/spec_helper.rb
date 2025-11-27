@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
-require 'omniauth-line-v2_1'
+require 'omniauth-line-v2'
 require 'webmock/rspec'
 
 RSpec.configure do |config|

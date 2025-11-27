@@ -5,11 +5,11 @@ require 'uri'
 
 module OmniAuth
   module Strategies
-    class LineV21 < OmniAuth::Strategies::OAuth2
+    class Line < OmniAuth::Strategies::OAuth2
       DEFAULT_SCOPE = 'profile openid email'
       ID_TOKEN_VERIFY_URL = 'https://api.line.me/oauth2/v2.1/verify'
 
-      option :name, 'line_v2_1'
+      option :name, 'line'
       option :client_options, {
         site: 'https://access.line.me',
         authorize_url: '/oauth2/v2.1/authorize',
