@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.0] - 2025-11-28
+
+- Rename strategy from `LineV21` to `Line`
+
 ## [1.2.0] - 2025-11-03
 
 - Refactor: Remove redundant user info endpoint call
