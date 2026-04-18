@@ -5,6 +5,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'json', '~> 2.7.6'
+gem 'rack', '< 3' if RUBY_VERSION < '2.6'
 gem 'rake'
 gem 'rspec'
 gem 'rubocop'
