@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 
 gemspec
 
+gem 'faraday', '< 2.15' if RUBY_ENGINE == 'truffleruby' && RUBY_VERSION < '3.3'
 if RUBY_ENGINE == 'truffleruby' && RUBY_VERSION < '3.3'
   gem 'json', '~> 2.7.6'
 else
