@@ -219,7 +219,7 @@ RSpec.describe OmniAuth::Strategies::Line do # rubocop:disable RSpec/SpecFilePat
   describe '#authorize_params' do
     let(:request) { instance_double(Rack::Request, params: {}) }
 
-    before { allow(strategy).to receive_messages(request: request, session: {}) }
+    before { allow(strategy).to receive_messages(request: request, session: {}, full_host: 'https://example.com') }
 
     it 'includes default scope when not specified' do
       params = strategy.authorize_params
@@ -243,10 +243,18 @@ RSpec.describe OmniAuth::Strategies::Line do # rubocop:disable RSpec/SpecFilePat
     context 'with state in request params' do
       let(:request) { instance_double(Rack::Request, params: { 'state' => '12345abcde' }) }
 
-      it 'includes state in params and stores in session' do
+      it 'includes state in params' do
         params = strategy.authorize_params
         expect(params[:state]).to eq('12345abcde')
-        expect(strategy.session['omniauth.state']).to eq('12345abcde')
+      end
+    end
+
+    context 'with empty state in request params' do
+      let(:request) { instance_double(Rack::Request, params: { 'state' => '' }) }
+
+      it 'generates state' do
+        params = strategy.authorize_params
+        expect(params[:state]).to match(/\A\h{48}\z/)
       end
     end
 
@@ -498,6 +506,58 @@ RSpec.describe OmniAuth::Strategies::Line do # rubocop:disable RSpec/SpecFilePat
         result = strategy.send(:verify_and_decode_id_token, 'test_id_token')
         expect(result).to be_nil
         expect(strategy).to have_received(:fail!).with(:id_token_verification_failed, instance_of(StandardError))
+      end
+    end
+  end
+
+  describe 'sign-in flow' do
+    let(:callback_env) { {} }
+    let(:app) do
+      session = {}
+      captured_env = callback_env
+      Rack::Builder.new do
+        use(Rack::Config) { |env| env['rack.session'] = session }
+        use OmniAuth::Builder do
+          provider :line, 'channel_id', 'channel_secret'
+        end
+        run ->(env) { [200, {}, []].tap { captured_env.update(env) } }
+      end
+    end
+
+    before do
+      allow(OmniAuth.config).to receive_messages(logger: Logger.new(IO::NULL), request_validation_phase: nil)
+      stub_request(:post, 'https://api.line.me/oauth2/v2.1/token')
+        .to_return(headers: { 'Content-Type' => 'application/json' }, body: { access_token: 'token', id_token: 'id_token' }.to_json)
+      stub_request(:post, 'https://api.line.me/oauth2/v2.1/verify')
+        .to_return(headers: { 'Content-Type' => 'application/json' }, body: { sub: 'line123' }.to_json)
+    end
+
+    def sign_in(request_params)
+      mock_request = Rack::MockRequest.new(app)
+      response = mock_request.post('/auth/line', params: request_params)
+      authorize_params = Rack::Utils.parse_query(URI(response['location']).query)
+      mock_request.get('/auth/line/callback', params: { code: 'code', state: authorize_params['state'] })
+      authorize_params
+    end
+
+    it 'completes with a generated state' do
+      authorize_params = sign_in('origin' => '/back')
+
+      expect(callback_env['omniauth.auth'].uid).to eq('line123')
+      expect(callback_env['omniauth.origin']).to eq('/back')
+      expect(WebMock).to have_requested(:post, 'https://api.line.me/oauth2/v2.1/verify')
+        .with(body: hash_including('nonce' => authorize_params['nonce']))
+    end
+
+    context 'with state in request params' do
+      it 'completes with the given state' do
+        authorize_params = sign_in('origin' => '/back', 'state' => 'custom-state')
+
+        expect(authorize_params['state']).to eq('custom-state')
+        expect(callback_env['omniauth.auth'].uid).to eq('line123')
+        expect(callback_env['omniauth.origin']).to eq('/back')
+        expect(WebMock).to have_requested(:post, 'https://api.line.me/oauth2/v2.1/verify')
+          .with(body: hash_including('nonce' => authorize_params['nonce']))
       end
     end
   end
