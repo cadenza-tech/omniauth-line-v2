@@ -74,17 +74,6 @@ module OmniAuth
         end
       end
 
-      def prune!(hash)
-        hash.delete_if do |_, value|
-          prune!(value) if value.is_a?(Hash)
-          empty?(value)
-        end
-      end
-
-      def empty?(value)
-        value.nil? || (value.respond_to?(:empty?) && value.empty?)
-      end
-
       def id_token_info
         return @id_token_info if defined?(@id_token_info)
 
@@ -117,6 +106,17 @@ module OmniAuth
         response
       rescue StandardError => e
         fail!(:id_token_verification_failed, e)
+      end
+
+      def prune!(hash)
+        hash.delete_if do |_, value|
+          prune!(value) if value.is_a?(Hash)
+          empty?(value)
+        end
+      end
+
+      def empty?(value)
+        value.nil? || (value.respond_to?(:empty?) && value.empty?)
       end
     end
   end
